@@ -21,6 +21,7 @@ const plans = [
   },
   {
     name: 'Starter',
+    featured: true,
     price: '$9',
     period: '/mo',
     description: 'For growing advertisers',
@@ -39,7 +40,6 @@ const plans = [
     period: '/mo',
     description: 'For serious advertisers',
     priceId: 'price_1SYOWOLvvY2iVbuYa0ovAR0G',
-    featured: true,
     features: [
       'Meta API connection',
       '5 ad accounts',
