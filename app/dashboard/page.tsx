@@ -36,15 +36,14 @@ const SAMPLE_DATA: CSVRow[] = [
   { date_start: '2024-01-15', date_end: '2024-01-21', ad_name: 'Retargeting - Viewed', campaign_name: 'Retargeting', adset_name: 'Product Viewers', impressions: 25000, clicks: 380, spend: 320, purchases: 8, revenue: 1600 },
 ]
 
-type DashboardPageProps = {
-  userPlan?: string
-}
-
-export default function DashboardPage({ userPlan = 'Free' }: DashboardPageProps) {
+export default function DashboardPage() {
   const [data, setData] = useState<CSVRow[]>(SAMPLE_DATA)
   const [rules, setRules] = useState<Rules>(DEFAULT_RULES)
   const [showUpload, setShowUpload] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  
+  // TODO: Get from subscription context/database
+  const userPlan = 'Free'
   
   // Get unique campaigns
   const allCampaigns = [...new Set(data.map(row => row.campaign_name))]
@@ -188,7 +187,7 @@ export default function DashboardPage({ userPlan = 'Free' }: DashboardPageProps)
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setShowUpload(false)}
           />
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-bg-sidebar border border-border rounded-xl p-6 z-50 ">
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-bg-sidebar border border-border rounded-xl p-6 z-50">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold">Upload CSV</h2>
               <button 
