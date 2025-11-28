@@ -41,12 +41,13 @@ export function Sidebar() {
   return (
     <aside className="w-60 bg-bg-sidebar border-r border-border fixed h-screen overflow-y-auto flex flex-col p-4">
       {/* Logo */}
-      <Link href="/dashboard" className="flex items-center gap-3 px-2 mb-6">
-        <div className="w-9 h-9 bg-gradient-to-br from-emerald-600 to-emerald-400 rounded-lg flex items-center justify-center text-lg">
-          ⚖️
-        </div>
-        <span className="font-mono font-bold text-lg">ScaleOrCut</span>
-      </Link>
+      <Link href="/dashboard" className="flex items-center gap-2 px-2 mb-6">
+  <svg width="180" height="32" viewBox="0 0 220 40">
+    <path d="M12 32 L12 10 L4 18 M12 10 L20 18" stroke="#10b981" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M28 8 L28 30 L20 22 M28 30 L36 22" stroke="#ef4444" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    <text x="48" y="28" fill="white" fontFamily="'JetBrains Mono', monospace" fontWeight="700" fontSize="18">Scale Or Cut</text>
+  </svg>
+</Link>
       
       {/* Account Selector */}
       <div 
