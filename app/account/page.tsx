@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
+import { useSubscription } from '@/lib/subscription'
 import { createClient } from '@supabase/supabase-js'
 import { User, CreditCard, Key, ArrowLeft } from 'lucide-react'
 
@@ -13,14 +14,13 @@ const supabase = createClient(
 
 export default function AccountPage() {
   const { user } = useAuth()
-  const [currentPassword, setCurrentPassword] = useState('')
+  const { plan, subscription } = useSubscription()
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [passwordSuccess, setPasswordSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const userPlan = 'Free' // TODO: Get from Stripe/database
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -48,7 +48,6 @@ export default function AccountPage() {
       setPasswordError(error.message)
     } else {
       setPasswordSuccess('Password updated successfully')
-      setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
     }
@@ -56,9 +55,11 @@ export default function AccountPage() {
     setLoading(false)
   }
 
-  const handleManageBilling = async () => {
-    // TODO: Create Stripe customer portal session
-    alert('Billing portal coming soon! Contact support@scaleorcut.com for subscription changes.')
+  const planFeatures: Record<string, string> = {
+    'Free': '5 campaigns max',
+    'Starter': 'Unlimited campaigns',
+    'Pro': '5 ad accounts + API',
+    'Agency': 'Unlimited accounts + API'
   }
 
   if (!user) {
@@ -89,7 +90,6 @@ export default function AccountPage() {
       <div className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-8">Account Settings</h1>
 
-        {/* Profile Section */}
         <div className="bg-bg-card border border-border rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <User className="w-5 h-5 text-accent" />
@@ -108,7 +108,6 @@ export default function AccountPage() {
           </div>
         </div>
 
-        {/* Subscription Section */}
         <div className="bg-bg-card border border-border rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <CreditCard className="w-5 h-5 text-accent" />
@@ -117,35 +116,22 @@ export default function AccountPage() {
           
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-white font-medium">{userPlan} Plan</div>
+              <div className="text-white font-medium">{plan} Plan</div>
               <div className="text-sm text-zinc-500">
-                {userPlan === 'Free' 
-                  ? '5 campaigns max' 
-                  : userPlan === 'Starter'
-                    ? 'Unlimited campaigns'
-                    : 'Full API access'}
+                {planFeatures[plan] || 'Basic features'}
               </div>
             </div>
             <div className="flex gap-3">
-              {userPlan !== 'Free' && (
-                <button
-                  onClick={handleManageBilling}
-                  className="px-4 py-2 text-sm border border-border rounded-lg hover:border-zinc-500 transition-colors"
-                >
-                  Manage Billing
-                </button>
-              )}
               <Link
                 href="/pricing"
                 className="px-4 py-2 text-sm bg-accent hover:bg-accent-hover text-white rounded-lg transition-colors"
               >
-                {userPlan === 'Free' ? 'Upgrade' : 'Change Plan'}
+                {plan === 'Free' ? 'Upgrade' : 'Change Plan'}
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Password Section */}
         <div className="bg-bg-card border border-border rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <Key className="w-5 h-5 text-accent" />

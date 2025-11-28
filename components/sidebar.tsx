@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
+import { useSubscription } from '@/lib/subscription'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -22,20 +23,20 @@ const navItems = [
   { href: '/dashboard/settings', label: 'Rules', icon: Settings },
 ]
 
-type SidebarProps = {
-  accountName?: string
-  userName?: string
-  userPlan?: string
-}
-
-export function Sidebar({ 
-  accountName = 'My Store',
-  userName = 'User',
-  userPlan = 'Free'
-}: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname()
-  const { signOut } = useAuth()
+  const { user, signOut } = useAuth()
+  const { plan } = useSubscription()
   const [showTooltip, setShowTooltip] = useState(false)
+
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
+  const accountName = 'My Store'
+  
+  const upgradeText = plan === 'Free' 
+    ? { title: 'Upgrade to Starter', subtitle: 'Unlimited campaigns' }
+    : plan === 'Starter'
+      ? { title: 'Upgrade to Pro', subtitle: 'Meta API connection' }
+      : null
   
   return (
     <aside className="w-60 bg-bg-sidebar border-r border-border fixed h-screen overflow-y-auto flex flex-col p-4">
@@ -58,7 +59,7 @@ export function Sidebar({
           {accountName}
           <ChevronDown className="w-4 h-4 text-zinc-600" />
         </div>
-        {showTooltip && userPlan === 'Free' && (
+        {showTooltip && (plan === 'Free' || plan === 'Starter') && (
           <div className="absolute left-0 right-0 top-full mt-2 p-2 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-300 text-center z-10">
             Multiple accounts available in Pro & Agency plans
           </div>
@@ -110,13 +111,13 @@ export function Sidebar({
       <div className="flex-1" />
 
       {/* Upgrade CTA */}
-      {userPlan === 'Free' && (
+      {upgradeText && (
         <Link
           href="/pricing"
           className="block mb-4 p-3 bg-gradient-to-r from-accent/20 to-emerald-500/20 border border-accent/30 rounded-lg text-center hover:border-accent transition-colors"
         >
-          <div className="text-sm font-semibold text-accent">Upgrade to Starter</div>
-          <div className="text-xs text-zinc-500">Unlimited campaigns</div>
+          <div className="text-sm font-semibold text-accent">{upgradeText.title}</div>
+          <div className="text-xs text-zinc-500">{upgradeText.subtitle}</div>
         </Link>
       )}
       
@@ -130,7 +131,7 @@ export function Sidebar({
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium truncate">{userName}</div>
-          <div className="text-xs text-zinc-500">{userPlan} Plan</div>
+          <div className="text-xs text-zinc-500">{plan} Plan</div>
         </div>
       </Link>
       

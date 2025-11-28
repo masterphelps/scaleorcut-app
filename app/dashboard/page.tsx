@@ -1,19 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { RefreshCw, Download, Upload, Calendar, Settings, Lock } from 'lucide-react'
+import { Upload, Calendar, Lock } from 'lucide-react'
 import { StatCard } from '@/components/stat-card'
 import { PerformanceTable } from '@/components/performance-table'
 import { CSVUpload } from '@/components/csv-upload'
-import { VerdictBadge } from '@/components/verdict-badge'
 import { CSVRow } from '@/lib/csv-parser'
 import { Rules } from '@/lib/supabase'
 import { formatCurrency, formatNumber, formatROAS, formatDateRange } from '@/lib/utils'
+import { useSubscription } from '@/lib/subscription'
 import Link from 'next/link'
 
 const FREE_CAMPAIGN_LIMIT = 5
 
-// Default rules
 const DEFAULT_RULES: Rules = {
   id: '',
   ad_account_id: '',
@@ -24,7 +23,6 @@ const DEFAULT_RULES: Rules = {
   updated_at: ''
 }
 
-// Sample data for demo
 const SAMPLE_DATA: CSVRow[] = [
   { date_start: '2024-01-15', date_end: '2024-01-21', ad_name: 'Video - Summer Vibes', campaign_name: 'Summer Sale 2024', adset_name: 'Lookalike 1%', impressions: 45000, clicks: 1100, spend: 750, purchases: 18, revenue: 3400 },
   { date_start: '2024-01-15', date_end: '2024-01-21', ad_name: 'Carousel - Products', campaign_name: 'Summer Sale 2024', adset_name: 'Lookalike 1%', impressions: 40000, clicks: 800, spend: 650, purchases: 10, revenue: 1800 },
@@ -41,24 +39,21 @@ export default function DashboardPage() {
   const [rules, setRules] = useState<Rules>(DEFAULT_RULES)
   const [showUpload, setShowUpload] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const { plan } = useSubscription()
   
-  // TODO: Get from subscription context/database
-  const userPlan = 'Free'
+  const userPlan = plan
   
-  // Get unique campaigns
   const allCampaigns = Array.from(new Set(data.map(row => row.campaign_name)))
   const totalCampaigns = allCampaigns.length
   const isLimited = userPlan === 'Free' && totalCampaigns > FREE_CAMPAIGN_LIMIT
   const hiddenCampaigns = isLimited ? totalCampaigns - FREE_CAMPAIGN_LIMIT : 0
   
-  // Filter data for free users
   const visibleCampaigns = userPlan === 'Free' 
     ? allCampaigns.slice(0, FREE_CAMPAIGN_LIMIT)
     : allCampaigns
   
   const filteredData = data.filter(row => visibleCampaigns.includes(row.campaign_name))
   
-  // Calculate totals from filtered data
   const totals = {
     spend: filteredData.reduce((sum, row) => sum + row.spend, 0),
     revenue: filteredData.reduce((sum, row) => sum + row.revenue, 0),
@@ -68,7 +63,6 @@ export default function DashboardPage() {
   }
   totals.roas = totals.spend > 0 ? totals.revenue / totals.spend : 0
   
-  // Get date range from data
   const dateRange = {
     start: data.length > 0 ? data[0].date_start : new Date().toISOString().split('T')[0],
     end: data.length > 0 ? data[0].date_end : new Date().toISOString().split('T')[0]
@@ -79,7 +73,6 @@ export default function DashboardPage() {
     setShowUpload(false)
   }
   
-  // Transform data for table
   const tableData = filteredData.map(row => ({
     campaign_name: row.campaign_name,
     adset_name: row.adset_name,
@@ -94,7 +87,6 @@ export default function DashboardPage() {
   
   return (
     <>
-      {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold mb-1">Dashboard</h1>
@@ -122,7 +114,6 @@ export default function DashboardPage() {
         </div>
       </div>
       
-      {/* Campaign Limit Warning */}
       {isLimited && (
         <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -145,7 +136,6 @@ export default function DashboardPage() {
         </div>
       )}
       
-      {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-4 mb-8">
         <StatCard 
           label="Total Spend" 
@@ -173,14 +163,12 @@ export default function DashboardPage() {
         />
       </div>
       
-      {/* Performance Table */}
       <PerformanceTable 
         data={tableData}
         rules={rules}
         dateRange={dateRange}
       />
       
-      {/* Upload Modal */}
       {showUpload && (
         <>
           <div 
