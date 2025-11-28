@@ -4,7 +4,7 @@ import { AuthProvider } from '@/lib/auth'
 import { SubscriptionProvider } from '@/lib/subscription'
 
 export const metadata: Metadata = {
-  title: 'ScaleOrCut - Meta Ads Dashboard',
+  title: 'KillScale - Meta Ads Dashboard',
   description: 'See your Meta Ads at a glance. Know what to scale, watch, and cut in 30 seconds.',
 }
 

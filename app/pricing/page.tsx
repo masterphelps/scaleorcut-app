@@ -112,7 +112,7 @@ export default function PricingPage() {
             <div className="w-9 h-9 bg-gradient-to-br from-emerald-600 to-emerald-400 rounded-lg flex items-center justify-center text-lg">
               ⚖️
             </div>
-            <span className="font-mono font-bold text-lg">ScaleOrCut</span>
+            <span className="font-mono font-bold text-lg">KillScale</span>
           </Link>
           {user ? (
             <Link href="/dashboard" className="text-sm text-zinc-400 hover:text-white">

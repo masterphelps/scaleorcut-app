@@ -66,7 +66,7 @@ export default function SignupPage() {
             <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-emerald-400 rounded-lg flex items-center justify-center text-xl">
               ⚖️
             </div>
-            <span className="font-mono font-bold text-2xl">ScaleOrCut</span>
+            <span className="font-mono font-bold text-2xl">KillScale</span>
           </Link>
         </div>
 

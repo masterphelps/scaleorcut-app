@@ -42,12 +42,13 @@ export function Sidebar() {
     <aside className="w-60 bg-bg-sidebar border-r border-border fixed h-screen overflow-y-auto flex flex-col p-4">
       {/* Logo */}
       <Link href="/dashboard" className="flex items-center gap-2 px-2 mb-6">
-  <svg width="180" height="32" viewBox="0 0 220 40">
-    <path d="M12 32 L12 10 L4 18 M12 10 L20 18" stroke="#10b981" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M28 8 L28 30 L20 22 M28 30 L36 22" stroke="#ef4444" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-    <text x="48" y="28" fill="white" fontFamily="'JetBrains Mono', monospace" fontWeight="700" fontSize="18">Scale Or Cut</text>
-  </svg>
-</Link>
+      <svg width="180" height="36" viewBox="0 0 280 50">
+        <rect x="5" y="8" width="40" height="34" rx="8" fill="#1a1a1a"/>
+        <path d="M15 18 L15 32 L10 27 M15 32 L20 27" stroke="#ef4444" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M30 32 L30 18 L25 23 M30 18 L35 23" stroke="#10b981" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        <text x="55" y="33" fill="white" fontFamily="Inter, sans-serif" fontWeight="700" fontSize="24">KillScale</text>
+      </svg>
+    </Link>
       
       {/* Account Selector */}
       <div 
