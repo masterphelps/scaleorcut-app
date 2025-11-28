@@ -46,7 +46,7 @@ export default function DashboardPage() {
   const userPlan = 'Free'
   
   // Get unique campaigns
-  const allCampaigns = [...new Set(data.map(row => row.campaign_name))]
+  const allCampaigns = Array.from(new Set(data.map(row => row.campaign_name)))
   const totalCampaigns = allCampaigns.length
   const isLimited = userPlan === 'Free' && totalCampaigns > FREE_CAMPAIGN_LIMIT
   const hiddenCampaigns = isLimited ? totalCampaigns - FREE_CAMPAIGN_LIMIT : 0
