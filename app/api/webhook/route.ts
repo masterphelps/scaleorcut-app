@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     if (userId && subscriptionId) {
       // Get subscription details
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId) as any
       const priceId = subscription.items.data[0].price.id
       const plan = PRICE_TO_PLAN[priceId] || 'starter'
 
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (event.type === 'customer.subscription.updated') {
-    const subscription = event.data.object as Stripe.Subscription
+    const subscription = event.data.object as any
     const priceId = subscription.items.data[0].price.id
     const plan = PRICE_TO_PLAN[priceId] || 'starter'
 
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (event.type === 'customer.subscription.deleted') {
-    const subscription = event.data.object as Stripe.Subscription
+    const subscription = event.data.object as any
 
     const { error } = await supabase
       .from('subscriptions')
