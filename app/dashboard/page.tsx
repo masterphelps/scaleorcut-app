@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { RefreshCw, Download, Upload, Calendar, Settings } from 'lucide-react'
+import { RefreshCw, Download, Upload, Calendar, Settings, Lock } from 'lucide-react'
 import { StatCard } from '@/components/stat-card'
 import { PerformanceTable } from '@/components/performance-table'
 import { CSVUpload } from '@/components/csv-upload'
@@ -9,6 +9,9 @@ import { VerdictBadge } from '@/components/verdict-badge'
 import { CSVRow } from '@/lib/csv-parser'
 import { Rules } from '@/lib/supabase'
 import { formatCurrency, formatNumber, formatROAS, formatDateRange } from '@/lib/utils'
+import Link from 'next/link'
+
+const FREE_CAMPAIGN_LIMIT = 5
 
 // Default rules
 const DEFAULT_RULES: Rules = {
@@ -33,18 +36,35 @@ const SAMPLE_DATA: CSVRow[] = [
   { date_start: '2024-01-15', date_end: '2024-01-21', ad_name: 'Retargeting - Viewed', campaign_name: 'Retargeting', adset_name: 'Product Viewers', impressions: 25000, clicks: 380, spend: 320, purchases: 8, revenue: 1600 },
 ]
 
-export default function DashboardPage() {
+type DashboardPageProps = {
+  userPlan?: string
+}
+
+export default function DashboardPage({ userPlan = 'Free' }: DashboardPageProps) {
   const [data, setData] = useState<CSVRow[]>(SAMPLE_DATA)
   const [rules, setRules] = useState<Rules>(DEFAULT_RULES)
   const [showUpload, setShowUpload] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   
-  // Calculate totals
+  // Get unique campaigns
+  const allCampaigns = [...new Set(data.map(row => row.campaign_name))]
+  const totalCampaigns = allCampaigns.length
+  const isLimited = userPlan === 'Free' && totalCampaigns > FREE_CAMPAIGN_LIMIT
+  const hiddenCampaigns = isLimited ? totalCampaigns - FREE_CAMPAIGN_LIMIT : 0
+  
+  // Filter data for free users
+  const visibleCampaigns = userPlan === 'Free' 
+    ? allCampaigns.slice(0, FREE_CAMPAIGN_LIMIT)
+    : allCampaigns
+  
+  const filteredData = data.filter(row => visibleCampaigns.includes(row.campaign_name))
+  
+  // Calculate totals from filtered data
   const totals = {
-    spend: data.reduce((sum, row) => sum + row.spend, 0),
-    revenue: data.reduce((sum, row) => sum + row.revenue, 0),
-    purchases: data.reduce((sum, row) => sum + row.purchases, 0),
-    impressions: data.reduce((sum, row) => sum + row.impressions, 0),
+    spend: filteredData.reduce((sum, row) => sum + row.spend, 0),
+    revenue: filteredData.reduce((sum, row) => sum + row.revenue, 0),
+    purchases: filteredData.reduce((sum, row) => sum + row.purchases, 0),
+    impressions: filteredData.reduce((sum, row) => sum + row.impressions, 0),
     roas: 0
   }
   totals.roas = totals.spend > 0 ? totals.revenue / totals.spend : 0
@@ -61,7 +81,7 @@ export default function DashboardPage() {
   }
   
   // Transform data for table
-  const tableData = data.map(row => ({
+  const tableData = filteredData.map(row => ({
     campaign_name: row.campaign_name,
     adset_name: row.adset_name,
     ad_name: row.ad_name,
@@ -102,6 +122,29 @@ export default function DashboardPage() {
           </button>
         </div>
       </div>
+      
+      {/* Campaign Limit Warning */}
+      {isLimited && (
+        <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Lock className="w-5 h-5 text-amber-500" />
+            <div>
+              <div className="font-medium text-amber-500">
+                {hiddenCampaigns} campaign{hiddenCampaigns > 1 ? 's' : ''} hidden
+              </div>
+              <div className="text-sm text-zinc-400">
+                Free plan is limited to {FREE_CAMPAIGN_LIMIT} campaigns. Upgrade to see all your data.
+              </div>
+            </div>
+          </div>
+          <Link 
+            href="/pricing"
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg text-sm transition-colors"
+          >
+            Upgrade Now
+          </Link>
+        </div>
+      )}
       
       {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-4 mb-8">
@@ -145,7 +188,7 @@ export default function DashboardPage() {
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setShowUpload(false)}
           />
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-bg-sidebar border border-border rounded-xl p-6 z-50 animate-fade-in">
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-bg-sidebar border border-border rounded-xl p-6 z-50 ">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold">Upload CSV</h2>
               <button 
