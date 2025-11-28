@@ -11,7 +11,7 @@ export type CSVRow = {
   revenue: number
 }
 
-const COLUMN_MAP: Record<string, keyof CSVRow> = {
+const COLUMN_MAP: Record<string, string> = {
   'reporting starts': 'date_start',
   'reporting ends': 'date_end',
   'ad name': 'ad_name',
@@ -35,7 +35,7 @@ export function parseCSV(text: string): CSVRow[] {
   for (let i = 1; i < lines.length; i++) {
     const values = lines[i].split('\t')
     
-    const row: Partial<CSVRow> = {}
+    const row: any = {}
     
     headers.forEach((header, index) => {
       const mappedKey = COLUMN_MAP[header]
@@ -45,7 +45,7 @@ export function parseCSV(text: string): CSVRow[] {
         if (['impressions', 'clicks', 'spend', 'purchases', 'revenue'].includes(mappedKey)) {
           row[mappedKey] = parseFloat(value.replace(/[,$]/g, '')) || 0
         } else {
-          row[mappedKey] = value as any
+          row[mappedKey] = value
         }
       }
     })
