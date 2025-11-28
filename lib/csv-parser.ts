@@ -68,3 +68,13 @@ export function parseCSV(text: string): CSVRow[] {
 
   return rows
 }
+
+export function generateSampleCSV(): string {
+  const headers = 'Reporting starts\tReporting ends\tAd name\tCampaign name\tAd set name\tImpressions\tLink clicks\tAmount spent (USD)\tDirect website purchases\tDirect website purchases conversion value'
+  const rows = [
+    '2024-01-15\t2024-01-21\tVideo - Summer Vibes\tSummer Sale 2024\tLookalike 1%\t45000\t1100\t750\t18\t3400',
+    '2024-01-15\t2024-01-21\tCarousel - Products\tSummer Sale 2024\tLookalike 1%\t40000\t800\t650\t10\t1800',
+    '2024-01-15\t2024-01-21\tStatic - Hero Image\tSummer Sale 2024\tInterest - Fashion\t35000\t720\t580\t8\t1400',
+  ]
+  return [headers, ...rows].join('\n')
+}
