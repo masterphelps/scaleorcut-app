@@ -40,28 +40,34 @@ export async function POST(request: NextRequest) {
     const subscriptionId = session.subscription as string
 
     if (userId && subscriptionId) {
-      // Get subscription details
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId) as any
-      const priceId = subscription.items.data[0].price.id
-      const plan = PRICE_TO_PLAN[priceId] || 'starter'
+      try {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId) as any
+        const priceId = subscription.items.data[0].price.id
+        const plan = PRICE_TO_PLAN[priceId] || 'starter'
 
-      // Upsert subscription in database
-      const { error } = await supabase
-        .from('subscriptions')
-        .upsert({
-          user_id: userId,
-          stripe_customer_id: customerId,
-          stripe_subscription_id: subscriptionId,
-          plan: plan,
-          status: 'active',
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id'
-        })
+        const periodEnd = subscription.current_period_end 
+          ? new Date(subscription.current_period_end * 1000).toISOString()
+          : null
 
-      if (error) {
-        console.error('Error saving subscription:', error)
+        const { error } = await supabase
+          .from('subscriptions')
+          .upsert({
+            user_id: userId,
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId,
+            plan: plan,
+            status: 'active',
+            current_period_end: periodEnd,
+            updated_at: new Date().toISOString(),
+          }, {
+            onConflict: 'user_id'
+          })
+
+        if (error) {
+          console.error('Error saving subscription:', error)
+        }
+      } catch (err) {
+        console.error('Error retrieving subscription:', err)
       }
     }
   }
@@ -71,12 +77,16 @@ export async function POST(request: NextRequest) {
     const priceId = subscription.items.data[0].price.id
     const plan = PRICE_TO_PLAN[priceId] || 'starter'
 
+    const periodEnd = subscription.current_period_end 
+      ? new Date(subscription.current_period_end * 1000).toISOString()
+      : null
+
     const { error } = await supabase
       .from('subscriptions')
       .update({
         plan: plan,
         status: subscription.status,
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        current_period_end: periodEnd,
         updated_at: new Date().toISOString(),
       })
       .eq('stripe_subscription_id', subscription.id)
