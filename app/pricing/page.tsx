@@ -10,13 +10,27 @@ const plans = [
     name: 'Free',
     price: '$0',
     period: '/mo',
-    description: 'For testing the waters',
+    description: 'Try it out',
     priceId: null,
     features: [
-      '1 ad account',
-      'Manual CSV upload',
+      'CSV upload',
+      '5 campaigns max',
       'Full hierarchy view',
       'Custom thresholds',
+    ],
+  },
+  {
+    name: 'Starter',
+    price: '$9',
+    period: '/mo',
+    description: 'For growing advertisers',
+    priceId: 'price_1SYQDFLvvY2iVbuY0njXKK4c',
+    features: [
+      'CSV upload',
+      'Unlimited campaigns',
+      'Full hierarchy view',
+      'Custom thresholds',
+      'Priority support',
     ],
   },
   {
@@ -27,12 +41,13 @@ const plans = [
     priceId: 'price_1SYOWOLvvY2iVbuYa0ovAR0G',
     featured: true,
     features: [
-      '3 ad accounts',
       'Meta API connection',
+      '5 ad accounts',
       'Daily auto-refresh',
       'Date range comparisons',
       'Email alerts',
     ],
+    comingSoon: true,
   },
   {
     name: 'Agency',
@@ -41,12 +56,13 @@ const plans = [
     description: 'For teams & clients',
     priceId: 'price_1SYOWlLvvY2iVbuYgxcY88pk',
     features: [
-      '10 ad accounts',
+      'Meta API connection',
+      'Unlimited ad accounts',
       'Hourly refresh',
       'White-label reports',
       'Team access',
-      'Priority support',
     ],
+    comingSoon: true,
   },
 ]
 
@@ -113,14 +129,14 @@ export default function PricingPage() {
       <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Simple, honest pricing</h1>
-          <p className="text-zinc-500 text-lg">No enterprise sales calls. No hidden fees. Cancel anytime.</p>
+          <p className="text-zinc-500 text-lg">Start free. Upgrade when you need more.</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`bg-bg-card border rounded-2xl p-8 relative ${
+              className={`bg-bg-card border rounded-2xl p-6 relative ${
                 plan.featured 
                   ? 'border-accent bg-gradient-to-b from-accent/10 to-bg-card' 
                   : 'border-border'
@@ -131,22 +147,28 @@ export default function PricingPage() {
                   POPULAR
                 </div>
               )}
+              
+              {plan.comingSoon && (
+                <div className="absolute top-4 right-4 px-2 py-1 bg-zinc-700 text-zinc-300 text-xs font-medium rounded">
+                  COMING SOON
+                </div>
+              )}
 
               <div className="mb-6">
                 <div className="text-sm text-zinc-500 uppercase tracking-wide mb-1">
                   {plan.name}
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold">{plan.price}</span>
+                  <span className="text-3xl font-bold">{plan.price}</span>
                   <span className="text-zinc-500">{plan.period}</span>
                 </div>
-                <p className="text-zinc-500 mt-2">{plan.description}</p>
+                <p className="text-zinc-500 mt-2 text-sm">{plan.description}</p>
               </div>
 
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-3 mb-6">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3 text-sm">
-                    <Check className="w-5 h-5 text-accent flex-shrink-0" />
+                  <li key={feature} className="flex items-center gap-2 text-sm">
+                    <Check className="w-4 h-4 text-accent flex-shrink-0" />
                     {feature}
                   </li>
                 ))}
@@ -154,26 +176,36 @@ export default function PricingPage() {
 
               {plan.priceId ? (
                 <button
-                  onClick={() => handleCheckout(plan.priceId!, plan.name)}
-                  disabled={loading !== null}
-                  className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-                    plan.featured
-                      ? 'bg-accent hover:bg-accent-hover text-white'
-                      : 'bg-bg-dark border border-border hover:border-accent text-white'
+                  onClick={() => !plan.comingSoon && handleCheckout(plan.priceId!, plan.name)}
+                  disabled={loading !== null || plan.comingSoon}
+                  className={`w-full py-3 rounded-lg font-semibold transition-colors text-sm ${
+                    plan.comingSoon
+                      ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                      : plan.featured
+                        ? 'bg-accent hover:bg-accent-hover text-white'
+                        : 'bg-bg-dark border border-border hover:border-accent text-white'
                   } disabled:opacity-50`}
                 >
-                  {loading === plan.name ? 'Loading...' : `Get ${plan.name}`}
+                  {plan.comingSoon 
+                    ? 'Coming Soon' 
+                    : loading === plan.name 
+                      ? 'Loading...' 
+                      : `Get ${plan.name}`}
                 </button>
               ) : (
                 <Link
                   href={user ? '/dashboard' : '/signup'}
-                  className="block w-full py-3 rounded-lg font-semibold text-center bg-bg-dark border border-border hover:border-accent text-white transition-colors"
+                  className="block w-full py-3 rounded-lg font-semibold text-center text-sm bg-bg-dark border border-border hover:border-accent text-white transition-colors"
                 >
                   {user ? 'Current Plan' : 'Get Started'}
                 </Link>
               )}
             </div>
           ))}
+        </div>
+        
+        <div className="mt-12 text-center text-zinc-500 text-sm">
+          <p>All plans include a 7-day money-back guarantee. Cancel anytime.</p>
         </div>
       </div>
     </div>
