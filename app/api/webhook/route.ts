@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     if (userId && subscriptionId) {
       // Get subscription details
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription
       const priceId = subscription.items.data[0].price.id
       const plan = PRICE_TO_PLAN[priceId] || 'starter'
 
