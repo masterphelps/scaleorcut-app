@@ -7,7 +7,7 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="min-h-screen bg-bg-dark">
-      <Sidebar accountName="My Store" userName="Nick" userPlan="Pro" />
+      <Sidebar accountName="My Store" userName="Nick" userPlan="Free" />
       <main className="ml-60 p-8">
         {children}
       </main>

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 import { 
   BarChart3, 
   TrendingUp, 
@@ -34,6 +35,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname()
   const { signOut } = useAuth()
+  const [showTooltip, setShowTooltip] = useState(false)
   
   return (
     <aside className="w-60 bg-bg-sidebar border-r border-border fixed h-screen overflow-y-auto flex flex-col p-4">
@@ -46,12 +48,21 @@ export function Sidebar({
       </Link>
       
       {/* Account Selector */}
-      <div className="bg-bg-card border border-border rounded-lg p-3 mb-6">
+      <div 
+        className="bg-bg-card border border-border rounded-lg p-3 mb-6 relative"
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
         <div className="text-xs text-zinc-500 mb-1">Ad Account</div>
-        <button className="w-full flex items-center justify-between text-sm font-medium">
+        <div className="w-full flex items-center justify-between text-sm font-medium text-zinc-400 cursor-default">
           {accountName}
-          <ChevronDown className="w-4 h-4 text-zinc-500" />
-        </button>
+          <ChevronDown className="w-4 h-4 text-zinc-600" />
+        </div>
+        {showTooltip && userPlan === 'Free' && (
+          <div className="absolute left-0 right-0 top-full mt-2 p-2 bg-zinc-800 border border-zinc-700 rounded-lg text-xs text-zinc-300 text-center z-10">
+            Multiple accounts available in Pro & Agency plans
+          </div>
+        )}
       </div>
       
       {/* Navigation */}
@@ -104,13 +115,16 @@ export function Sidebar({
           href="/pricing"
           className="block mb-4 p-3 bg-gradient-to-r from-accent/20 to-emerald-500/20 border border-accent/30 rounded-lg text-center hover:border-accent transition-colors"
         >
-          <div className="text-sm font-semibold text-accent">Upgrade to Pro</div>
-          <div className="text-xs text-zinc-500">Get 3 accounts + API</div>
+          <div className="text-sm font-semibold text-accent">Upgrade to Starter</div>
+          <div className="text-xs text-zinc-500">Unlimited campaigns</div>
         </Link>
       )}
       
       {/* User Menu */}
-      <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-bg-hover transition-colors">
+      <Link 
+        href="/account"
+        className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-bg-hover transition-colors"
+      >
         <div className="w-8 h-8 bg-gradient-to-br from-accent to-purple-500 rounded-lg flex items-center justify-center text-sm font-semibold">
           {userName.charAt(0).toUpperCase()}
         </div>
@@ -118,7 +132,7 @@ export function Sidebar({
           <div className="text-sm font-medium truncate">{userName}</div>
           <div className="text-xs text-zinc-500">{userPlan} Plan</div>
         </div>
-      </div>
+      </Link>
       
       {/* Logout */}
       <button
